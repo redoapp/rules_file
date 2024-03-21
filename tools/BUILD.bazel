@@ -1,4 +1,3 @@
-load("//buildifier:rules.bzl", "buildifier")
 load("//file:rules.bzl", "bazelrc_deleted_packages", "find_packages")
 load("//generate:rules.bzl", "format", "generate", "generate_test", "multi_generate")
 load("//black:rules.bzl", "configure_black")
@@ -13,10 +12,6 @@ format(
     srcs = ["@files//:black_files"],
     formatter = ":black",
     strip_prefix = "/files",
-)
-
-buildifier(
-    name = "buildifier",
 )
 
 multi_generate(
@@ -35,7 +30,7 @@ generate_test(
 format(
     name = "buildifier_format",
     srcs = ["@files//:buildifier_files"],
-    formatter = ":buildifier",
+    formatter = "//buildifier",
     strip_prefix = "/files",
 )
 

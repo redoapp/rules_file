@@ -185,18 +185,11 @@ This repository has rules for buildifier, black, and gofmt. It is also used for 
 **WORKSPACE.bazel**
 
 ```bzl
-BUILDTOOLS_VERSION = "3.5.0"
+load("@rules_file//buildifier:workspace.bzl", "buildifier_repositories", "buildifier_toolchains")
 
-http_archive(
-    name = "com_github_bazelbuild_buildtools",
-    sha256 = "f5b666935a827bc2b6e2ca86ea56c796d47f2821c2ff30452d270e51c2a49708",
-    strip_prefix = "buildtools-%s" % BUILDTOOLS_VERSION,
-    url = "https://github.com/bazelbuild/buildtools/archive/%s.zip" % BUILDTOOLS_VERSION,
-)
+buildifier_repositories()
 
-load("@com_github_bazelbuild_buildtools//buildifier:deps.bzl", "buildifier_dependencies")
-
-buildifier_dependencies()
+buildifier_toolchains()
 
 files(
     name = "files"
@@ -205,20 +198,19 @@ files(
 )
 ```
 
+The `@rules_file//buildifier:toolchain_type` toolchain will download a
+pre-build executable of buildifier, if it exists. Otherwise, it will rely on the
+`@com_github_bazelbuild_buildtools` repo to build from source.
+
 **BUILD.bazel**
 
 ```bzl
-load("@rules_file//buildifier:rules.bzl", "buildifier")
 load("@rules_file//generate:rules.bzl", "format", "generate_test")
-
-buildifier(
-    name = "buildifier",
-)
 
 format(
     name = "buildifier_format",
     srcs = ["@files//:buildifier_files"],
-    formatter = ":buildifier",
+    formatter = "@rules_file//buildifier",
     strip_prefix = "files",
 )
 
