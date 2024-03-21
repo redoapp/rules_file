@@ -84,6 +84,14 @@ http_archive(
     url = "https://github.com/rivethealth/rivet-bazel-util/archive/%s.tar.gz" % RIVET_BAZEL_UTIL_VERSION,
 )
 
+# Buildifier
+
+load("@rules_file//buildifier:workspace.bzl", "buildifier_repositories", "buildifier_toolchains")
+
+buildifier_repositories()
+
+buildifier_toolchains()
+
 # Format
 
 load("//file:workspace.bzl", "files")

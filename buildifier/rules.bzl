@@ -10,7 +10,9 @@ def _buildifier_format(ctx, path, src, out, bin):
     )
 
 def _buildifier_impl(ctx):
-    bin = ctx.attr.bin[DefaultInfo]
+    buildifier = ctx.toolchains[":toolchain_type"]
+
+    bin = buildifier.buildifier
 
     def format(ctx, path, src, out):
         _buildifier_format(ctx, path, src, out, bin.files_to_run)
@@ -25,12 +27,21 @@ def _buildifier_impl(ctx):
 
 buildifier = rule(
     implementation = _buildifier_impl,
+    toolchains = [":toolchain_type"],
+)
+
+def _buildifier_toolchain_impl(ctx):
+    buildifier_default = ctx.attr.buildifier[DefaultInfo]
+
+    toolchain_info = platform_common.ToolchainInfo(
+        buildifier = buildifier_default,
+    )
+
+    return [toolchain_info]
+
+buildifier_toolchain = rule(
+    implementation = _buildifier_toolchain_impl,
     attrs = {
-        "bin": attr.label(
-            cfg = "exec",
-            default = "@com_github_bazelbuild_buildtools//buildifier",
-            doc = "Buildifier",
-            executable = True,
-        ),
+        "buildifier": attr.label(cfg = "target", executable = True, mandatory = True),
     },
 )
