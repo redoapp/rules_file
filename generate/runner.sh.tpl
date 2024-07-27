@@ -14,7 +14,8 @@ source "${RUNFILES_DIR:-/dev/null}/$f" 2>/dev/null || \
 set -e
 
 if [ "${1-}" = check ]; then
-    if "$(rlocation rules_file/generate/run/bin)" check @"$(rlocation %{check_args})"; then
+    check_args="$(rlocation %{check_args})"
+    if [ ! -s "$check_args" ] || "$(rlocation rules_file/generate/run/bin)" check @"$check_args"; then
       exit
     else
       code="$?"
@@ -27,4 +28,6 @@ if ! [ -z "${BUILD_WORKSPACE_DIRECTORY-}" ]; then
   cd "$BUILD_WORKSPACE_DIRECTORY"
 fi
 
-exec "$(rlocation rules_file/generate/run/bin)" write --file-mode=%{file_mode} --dir-mode=%{dir_mode} @"$(rlocation %{write_args})"
+write_args="$(rlocation %{write_args})"
+[ -s "$write_args" ] || exit
+exec "$(rlocation rules_file/generate/run/bin)" write --file-mode=%{file_mode} --dir-mode=%{dir_mode} @"$write_args"

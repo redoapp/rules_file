@@ -12,6 +12,7 @@ def main(args):
         # check diff
         diff = r.Rlocation(diff)
         if not os.path.getsize(diff):
+            raise Exception("Empty diff file" + diff)
             continue
 
         print(src)
