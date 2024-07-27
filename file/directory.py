@@ -1,9 +1,9 @@
-import argparse
-import pathlib
-import shutil
+from argparse import ArgumentParser
+from pathlib import Path
+from shutil import copy, copytree
 
-parser = argparse.ArgumentParser(fromfile_prefix_chars="@", prog="directory")
-parser.add_argument("files", type=pathlib.Path, nargs="*")
+parser = ArgumentParser(fromfile_prefix_chars="@", prog="directory")
+parser.add_argument("files", type=Path, nargs="*")
 args = parser.parse_args()
 
 for i in range(0, len(args.files), 2):
@@ -11,6 +11,6 @@ for i in range(0, len(args.files), 2):
     output = args.files[i + 1]
     output.parent.mkdir(parents=True, exist_ok=True)
     if input.is_dir():
-        shutil.copytree(input, output, copy_function=shutil.copy)
+        copytree(input, output, copy_function=copy)
     else:
-        shutil.copy(input, output)
+        copy(input, output)

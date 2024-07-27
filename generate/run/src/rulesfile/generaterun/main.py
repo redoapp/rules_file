@@ -1,13 +1,13 @@
 __package__ = "rulesfile.generaterun"
 
-import argparse
+from argparse import ArgumentParser
 
 
 def octal_int(x):
     return int(x, 8)
 
 
-parser = argparse.ArgumentParser(fromfile_prefix_chars="@")
+parser = ArgumentParser(fromfile_prefix_chars="@")
 subparsers = parser.add_subparsers(dest="command")
 
 check_parser = subparsers.add_parser("check")

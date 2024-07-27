@@ -1,7 +1,7 @@
-import os
-import os.path
-import shutil
-import stat
+from os import chmod, makedirs, remove, stat
+from os.path import dirname, join
+from shutil import copy, copytree
+from stat import S_ISDIR
 from rules_python.python.runfiles import runfiles
 
 r = runfiles.Create()
@@ -11,40 +11,37 @@ def main(args):
     for [src, out, diff] in args.files:
         # check diff
         diff = r.Rlocation(diff)
-        if not os.path.getsize(diff):
-            raise Exception("Empty diff file" + diff)
-            continue
 
         print(src)
 
         # remove src
         try:
-            src_stat = os.stat(src)
+            src_stat = stat(src)
         except FileNotFoundError:
             pass
         else:
-            if stat.S_ISDIR(src_stat.st_mode):
+            if S_ISDIR(src_stat.st_mode):
                 shutil.rmtree(src)
             else:
-                os.remove(src)
+                remove(src)
 
         if not out:
             continue
 
         # copy out to src
-        dir = os.path.dirname(src)
+        dir = dirname(src)
         if dir:
-            os.makedirs(os.path.dirname(src), exist_ok=True)
+            makedirs(dirname(src), exist_ok=True)
         out = r.Rlocation(out)
-        out_stat = os.stat(out)
-        if stat.S_ISDIR(out_stat.st_mode):
-            shutil.copytree(out, src, copy_function=shutil.copy)
-            os.chmod(src, args.dir_mode)
+        out_stat = stat(out)
+        if S_ISDIR(out_stat.st_mode):
+            copytree(out, src, copy_function=copy)
+            chmod(src, args.dir_mode)
             for dirpath, dirnames, filenames in os.walk(src):
                 for dirname in dirnames:
-                    os.chmod(os.path.join(dirpath, dirname), args.dir_mode)
+                    chmod(join(dirpath, dirname), args.dir_mode)
                 for filename in filenames:
-                    os.chmod(os.path.join(dirpath, filename), args.file_mode)
+                    chmod(join(dirpath, filename), args.file_mode)
         else:
-            shutil.copy(out, src)
-            os.chmod(src, args.file_mode)
+            copy(out, src)
+            chmod(src, args.file_mode)
