@@ -5,6 +5,7 @@ load(":runner.bzl", "create_runner")
 
 def _format_impl(ctx):
     actions = ctx.actions
+    args_default = ctx.attr._args[DefaultInfo]
     bash_runfiles = ctx.files._bash_runfiles
     diff = ctx.attr._diff[DefaultInfo]
     dir_mode = ctx.attr.dir_mode
@@ -30,6 +31,7 @@ def _format_impl(ctx):
 
     default_info = create_runner(
         actions = actions,
+        args_bin = args_default,
         bash_runfiles = bash_runfiles,
         bin = bin,
         diff_bin = diff,
@@ -64,6 +66,11 @@ format = rule(
         ),
         "strip_prefix": attr.string(),
         "prefix": attr.string(),
+        "_args": attr.label(
+            cfg = "exec",
+            default = "//generate/args:bin",
+            executable = True,
+        ),
         "_bash_runfiles": attr.label(
             allow_files = True,
             default = "@bazel_tools//tools/bash/runfiles",
@@ -113,6 +120,7 @@ formatter_composite = rule(
 
 def _generate_impl(ctx):
     actions = ctx.actions
+    args_default = ctx.attr._args[DefaultInfo]
     bash_runfiles = ctx.files._bash_runfiles
     data = ctx.files.data
     data_prefix = (
@@ -147,6 +155,7 @@ def _generate_impl(ctx):
     bin = ctx.actions.declare_file(name)
     default_info = create_runner(
         actions = actions,
+        args_bin = args_default,
         bash_runfiles = bash_runfiles,
         bin = bin,
         diff_bin = diff,
@@ -184,6 +193,11 @@ generate = rule(
         ),
         "dir_mode": attr.string(
             default = "775",
+        ),
+        "_args": attr.label(
+            cfg = "exec",
+            default = "//generate/args:bin",
+            executable = True,
         ),
         "_bash_runfiles": attr.label(
             allow_files = True,

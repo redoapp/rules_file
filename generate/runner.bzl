@@ -1,8 +1,9 @@
 load("@bazel_skylib//lib:shell.bzl", "shell")
 load("//util:path.bzl", "runfile_path")
 
-def create_runner(runfiles_fn, name, bash_runfiles, actions, bin, diff_bin, dir_mode, file_mode, label, run_bin, runner_template, file_defs, workspace_name):
-    arg_files = []
+def create_runner(args_bin, runfiles_fn, name, bash_runfiles, actions, bin, diff_bin, dir_mode, file_mode, label, run_bin, runner_template, file_defs, workspace_name):
+    check_args = []
+    write_args = []
     diffs = []
     for path, file_def in file_defs.items():
         diff = actions.declare_file("%s.diff/%s.patch" % (name, path))
@@ -21,55 +22,38 @@ def create_runner(runfiles_fn, name, bash_runfiles, actions, bin, diff_bin, dir_
         )
         diffs.append(diff)
 
-        check_args_file = actions.declare_file("%s.check/%s.args" % (name, path))
-        args = actions.args()
-        args.add(diff)
-        args.add(runfile_path(workspace_name, diff))
-        args.add(check_args_file)
-        actions.run_shell(
-            arguments = [args],
-            command = '([ ! -s "$1" ] || echo "$2") > "$3"',
-            execution_requirements = {"no-cache": "1"},
-            inputs = [diff],
-            mnemonic = "GenerateArgs",
-            outputs = [check_args_file],
-            progress_message = "Writing generate args for %{input}",
+        check_args.append(
+            struct(
+                diff = diff,
+                args = [runfile_path(workspace_name, diff)],
+            )
         )
-
-        write_args_file = actions.declare_file("%s.write/%s.args" % (name, path))
-        args = actions.args()
-        args.add(diff)
-        args.add("\n".join([
-            "--file",
-            path,
-            runfile_path(workspace_name, file_def.generated) if file_def.generated else "",
-            runfile_path(workspace_name, diff),
-        ]))
-        args.add(write_args_file)
-        actions.run_shell(
-            arguments = [args],
-            command = '([ ! -s "$1" ] || echo "$2") > "$3"',
-            execution_requirements = {"no-cache": "1"},
-            inputs = [diff],
-            mnemonic = "GenerateArgs",
-            outputs = [write_args_file],
-            progress_message = "Writing generate args for %{input}",
+        write_args.append(
+            struct(
+                diff = diff,
+                args = [
+                    "--file",
+                    path,
+                    runfile_path(workspace_name, file_def.generated) if file_def.generated else "",
+                    runfile_path(workspace_name, diff),
+                ]
+            )
         )
-
-        arg_files.append(struct(check = check_args_file, write = write_args_file))
 
     check_args_file = actions.declare_file("%s.check.args" % name)
-    _concat(
+    _args(
         actions = actions,
-        files = [arg_file.check for arg_file in arg_files],
+        args_bin = args_bin,
+        defs = check_args,
         output = check_args_file,
         prefix = "%s.check-" % name,
     )
 
     write_args_file = actions.declare_file("%s.write.args" % name)
-    _concat(
+    _args(
         actions = actions,
-        files = [arg_file.write for arg_file in arg_files],
+        args_bin = args_bin,
+        defs = write_args,
         output = write_args_file,
         prefix = "%s.write-" % name,
     )
@@ -106,26 +90,29 @@ def create_runner(runfiles_fn, name, bash_runfiles, actions, bin, diff_bin, dir_
 
 _BATCH = 100
 
-def _concat(actions, prefix, files, output):
-    if _BATCH <= len(files):
-        parts = []
-        for i in range(0, len(files), _BATCH):
-            part = actions.declare_file("%s%s" % (prefix, i // _BATCH))
-            args = actions.args()
-            args.add(part)
-            for file in files[i:i + _BATCH]:
-                args.add(file)
-            actions.run_shell(
-                arguments = [args],
-                command = 'out="$1" && shift && cat "$@" > "$out"',
-                execution_requirements = {"no-cache": "1"},
-                inputs = files[i:i + _BATCH],
-                mnemonic = "Concat",
-                outputs = [part],
-                progress_message = "Concatenating %{output}",
-            )
-            parts.append(part)
-        files = parts
+def _args(actions, args_bin, prefix, defs, output):
+    parts = []
+    for i in range(0, len(defs), _BATCH):
+        part = actions.declare_file("%s%x" % (prefix, i // _BATCH))
+        diffs = []
+        args = actions.args()
+        args.add("--output", part)
+        for def_ in defs[i:i + _BATCH]:
+            diffs.append(def_.diff)
+            args.add("=".join([def_.diff.path] + def_.args))
+        actions.run(
+            arguments = [args],
+            executable = args_bin.files_to_run.executable,
+            execution_requirements = {"no-remote-cache": "1"},
+            inputs = diffs,
+            mnemonic = "Args",
+            outputs = [part],
+            progress_message = "Writing args for %{input}",
+            tools = [args_bin.files_to_run],
+        )
+        parts.append(part)
+    files = parts
+
     args = actions.args()
     args.add(output)
     for file in files:
@@ -133,7 +120,7 @@ def _concat(actions, prefix, files, output):
     actions.run_shell(
         arguments = [args],
         command = 'out="$1" && shift && cat "$@" > "$out"',
-        execution_requirements = {"no-cache": "1"},
+        execution_requirements = {"no-remote-cache": "1"},
         inputs = files,
         mnemonic = "Concat",
         outputs = [output],
