@@ -5,7 +5,7 @@ from os.path import getsize
 
 
 def args(str):
-    return str.split("=", 1)
+    return str.split("=")
 
 
 parser = ArgumentParser(prog="generate-args")

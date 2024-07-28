@@ -29,5 +29,5 @@ if ! [ -z "${BUILD_WORKSPACE_DIRECTORY-}" ]; then
 fi
 
 write_args="$(rlocation %{write_args})"
-[ -s "$write_args" ] || exit
+[ -s "$write_args" ] || exit 0
 exec "$(rlocation rules_file/generate/run/bin)" write --file-mode=%{file_mode} --dir-mode=%{dir_mode} @"$write_args"

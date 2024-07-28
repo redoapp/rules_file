@@ -38,8 +38,8 @@ def main(args):
             copytree(out, src, copy_function=copy)
             chmod(src, args.dir_mode)
             for dirpath, dirnames, filenames in os.walk(src):
-                for dirname in dirnames:
-                    chmod(join(dirpath, dirname), args.dir_mode)
+                for dirname_ in dirnames:
+                    chmod(join(dirpath, dirname_), args.dir_mode)
                 for filename in filenames:
                     chmod(join(dirpath, filename), args.file_mode)
         else:
