@@ -26,7 +26,7 @@ def create_runner(args_bin, runfiles_fn, name, bash_runfiles, actions, bin, diff
             struct(
                 diff = diff,
                 args = [runfile_path(workspace_name, diff)],
-            )
+            ),
         )
         write_args.append(
             struct(
@@ -36,8 +36,8 @@ def create_runner(args_bin, runfiles_fn, name, bash_runfiles, actions, bin, diff
                     path,
                     runfile_path(workspace_name, file_def.generated) if file_def.generated else "",
                     runfile_path(workspace_name, diff),
-                ]
-            )
+                ],
+            ),
         )
 
     check_args_file = actions.declare_file("%s.check.args" % name)

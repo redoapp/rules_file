@@ -5,5 +5,6 @@ package(default_visibility = ["//visibility:public"])
 py_binary(
     name = "bin",
     srcs = glob(["src/**/*.py"]),
-    main = "src/__main__.py",
+    imports = ["src"],
+    main = "src/rulesfile/findpackages/__main__.py",
 )

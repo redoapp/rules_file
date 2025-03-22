@@ -10,12 +10,7 @@ def args(str):
 
 parser = ArgumentParser(prog="generate-args")
 parser.add_argument("--output", default="/dev/stdout")
-parser.add_argument(
-    "args",
-    help="file=arg1=arg2",
-    nargs="*",
-    type=args,
-)
+parser.add_argument("args", help="file=arg1=arg2", nargs="*", type=args)
 
 args = parser.parse_args()
 
