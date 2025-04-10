@@ -1,6 +1,6 @@
+load("//black:rules.bzl", "configure_black")
 load("//file:rules.bzl", "bazelrc_deleted_packages", "find_packages")
 load("//generate:rules.bzl", "format", "generate", "generate_test", "multi_generate")
-load("//black:rules.bzl", "configure_black")
 
 configure_black(
     name = "black",

@@ -255,8 +255,7 @@ def _multi_generate_impl(ctx):
 
 multi_generate = rule(
     attrs = {
-        "deps": attr.label_list(
-        ),
+        "deps": attr.label_list(),
         "_bash_runfiles": attr.label(
             allow_files = True,
             default = "@bazel_tools//tools/bash/runfiles",
