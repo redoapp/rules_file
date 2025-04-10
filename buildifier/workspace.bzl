@@ -1,7 +1,7 @@
 load("@bazel_tools//tools/build_defs/repo:http.bzl", "http_file")
 load(":buildifier.bzl", "BUILDIFIER_REPOS")
 
-def buildifier_repositories(version = "v6.4.0"):
+def buildifier_repositories(version = "v8.0.3"):
     for name, info in BUILDIFIER_REPOS[version].items():
         http_file(
             name = "buildifier_%s" % name,

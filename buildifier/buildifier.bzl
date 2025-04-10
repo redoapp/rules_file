@@ -7,26 +7,26 @@ BUILDIFIER_REPO_NAMES = [
 ]
 
 BUILDIFIER_REPOS = {
-    "v6.4.0": {
+    "v8.0.3": {
         "darwin_amd64": struct(
             path = "buildifier-darwin-amd64",
-            sha256 = "eeb47b2de27f60efe549348b183fac24eae80f1479e8b06cac0799c486df5bed",
+            sha256 = "b7a3152cde0b3971b1107f2274afe778c5c154dcdf6c9c669a231e3c004f047e",
         ),
         "darwin_arm64": struct(
             path = "buildifier-darwin-arm64",
-            sha256 = "fa07ba0d20165917ca4cc7609f9b19a8a4392898148b7babdf6bb2a7dd963f05",
+            sha256 = "674c663f7b5cd03c002f8ca834a8c1c008ccb527a0a2a132d08a7a355883b22d",
         ),
         "linux_amd64": struct(
             path = "buildifier-linux-amd64",
-            sha256 = "be63db12899f48600bad94051123b1fd7b5251e7661b9168582ce52396132e92",
+            sha256 = "c969487c1af85e708576c8dfdd0bb4681eae58aad79e68ae48882c70871841b7",
         ),
         "linux_arm64": struct(
             path = "buildifier-linux-arm64",
-            sha256 = "18540fc10f86190f87485eb86963e603e41fa022f88a2d1b0cf52ff252b5e1dd",
+            sha256 = "bdd9b92e2c65d46affeecaefb54e68d34c272d1f4a8c5b54929a3e92ab78820a",
         ),
         "windows_amd64": struct(
             path = "buildifier-windows-amd64.exe",
-            sha256 = "da8372f35e34b65fb6d997844d041013bb841e55f58b54d596d35e49680fe13c",
+            sha256 = "0019dfc4b32d63c1392aa264aed2253c1e0c2fb09216f8e2cc269bbfb8bb49b5",
         ),
     },
 }
