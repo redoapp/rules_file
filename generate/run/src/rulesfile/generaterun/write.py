@@ -1,6 +1,6 @@
-from os import chmod, makedirs, remove, stat
+from os import chmod, makedirs, remove, stat, walk
 from os.path import dirname, join
-from shutil import copy, copytree
+from shutil import copy, copytree, rmtree
 from stat import S_ISDIR
 from rules_python.python.runfiles import runfiles
 
@@ -21,7 +21,7 @@ def main(args):
             pass
         else:
             if S_ISDIR(src_stat.st_mode):
-                shutil.rmtree(src)
+                rmtree(src)
             else:
                 remove(src)
 
@@ -37,7 +37,7 @@ def main(args):
         if S_ISDIR(out_stat.st_mode):
             copytree(out, src, copy_function=copy)
             chmod(src, args.dir_mode)
-            for dirpath, dirnames, filenames in os.walk(src):
+            for dirpath, dirnames, filenames in walk(src):
                 for dirname_ in dirnames:
                     chmod(join(dirpath, dirname_), args.dir_mode)
                 for filename in filenames:
