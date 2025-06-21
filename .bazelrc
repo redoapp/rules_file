@@ -1,5 +1,10 @@
 import %workspace%/tools/deleted_packages.bazelrc
 
+common --noenable_bzlmod
+common --enable_workspace
+common --noincompatible_disallow_empty_glob
+common --repositories_without_autoloads=bazel_features_version,bazel_features_globals
+
 build --experimental_python_import_all_repositories=false
 
 test --test_output=streamed

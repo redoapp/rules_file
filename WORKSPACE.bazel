@@ -3,11 +3,11 @@ workspace(name = "rules_file")
 load("@bazel_tools//tools/build_defs/repo:http.bzl", "http_archive")
 
 # Python
-RULES_PYTHON_VERSION = "0.31.0"
+RULES_PYTHON_VERSION = "1.4.1"
 
 http_archive(
     name = "rules_python",
-    sha256 = "c68bdc4fbec25de5b5493b8819cfc877c4ea299c0dcb15c244c5a00208cde311",
+    sha256 = "9f9f3b300a9264e4c77999312ce663be5dee9a56e361a1f6fe7ec60e1beef9a3",
     strip_prefix = "rules_python-%s" % RULES_PYTHON_VERSION,
     url = "https://github.com/bazelbuild/rules_python/archive/%s.tar.gz" % RULES_PYTHON_VERSION,
 )
@@ -56,6 +56,22 @@ load("@bazel_gazelle//:deps.bzl", "gazelle_dependencies")
 
 gazelle_dependencies(go_repository_default_config = "//:WORKSPACE.bazel")
 
+# Java
+
+http_archive(
+    name = "rules_java",
+    sha256 = "1558508fc6c348d7f99477bd21681e5746936f15f0436b5f4233e30832a590f9",
+    url = "https://github.com/bazelbuild/rules_java/releases/download/8.12.0/rules_java-8.12.0.tar.gz",
+)
+
+load("@rules_java//java:rules_java_deps.bzl", "rules_java_dependencies")
+
+rules_java_dependencies()
+
+load("@bazel_features//:deps.bzl", "bazel_features_deps")
+
+bazel_features_deps()
+
 # Protobuf
 http_archive(
     name = "com_google_protobuf",
@@ -67,20 +83,6 @@ http_archive(
 load("@com_google_protobuf//:protobuf_deps.bzl", "protobuf_deps")
 
 protobuf_deps()
-
-# Buildtools
-BUILDTOOLS_VERSION = "3.5.0"
-
-http_archive(
-    name = "com_github_bazelbuild_buildtools",
-    sha256 = "f5b666935a827bc2b6e2ca86ea56c796d47f2821c2ff30452d270e51c2a49708",
-    strip_prefix = "buildtools-%s" % BUILDTOOLS_VERSION,
-    url = "https://github.com/bazelbuild/buildtools/archive/%s.zip" % BUILDTOOLS_VERSION,
-)
-
-load("@com_github_bazelbuild_buildtools//buildifier:deps.bzl", "buildifier_dependencies")
-
-buildifier_dependencies()
 
 # Rivet Bazel Util
 
@@ -95,7 +97,7 @@ http_archive(
 
 # Buildifier
 
-load("@rules_file//buildifier:workspace.bzl", "buildifier_repositories", "buildifier_toolchains")
+load("//buildifier:workspace.bzl", "buildifier_repositories", "buildifier_toolchains")
 
 buildifier_repositories()
 
