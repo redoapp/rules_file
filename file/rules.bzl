@@ -50,21 +50,31 @@ directory = rule(
 def _untar_impl(ctx):
     actions = ctx.actions
     name = ctx.attr.name
-    src = ctx.file.src
+    srcs = ([ctx.file.src] if ctx.attr.src else []) + ctx.files.srcs
     strip_components = ctx.attr.strip_components
 
     dir = actions.declare_directory(name)
 
     args = actions.args()
-    args.add(src)
     args.add(dir.path)
     args.add(str(strip_components))
+    args.add_all(srcs)
     actions.run_shell(
         arguments = [args],
         # prevent "Ignoring unknown extended header keyword"
-        command = 'mkdir -p "$2" && tar xf "$1" -C "$2" --strip-components "$3" 2> /dev/null',
+        command = '''
+set -e
+dir="$1"
+shift
+stp_cpts="$1"
+shift
+mkdir -p "$dir"
+for f in "$@"; do
+  tar xf "$f" -C "$dir" --strip-components "$stp_cpts" 2> /dev/null
+done
+        '''.strip(),
         execution_requirements = {"local": "1"},
-        inputs = [src],
+        inputs = srcs,
         outputs = [dir],
     )
 
@@ -76,7 +86,10 @@ untar = rule(
     attrs = {
         "src": attr.label(
             allow_single_file = True,
-            mandatory = True,
+            doc = "Deprecated: use srcs instead",
+        ),
+        "srcs": attr.label_list(
+            allow_files = True,
         ),
         "strip_components": attr.int(),
     },
