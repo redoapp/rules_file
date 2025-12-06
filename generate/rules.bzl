@@ -1,4 +1,5 @@
 load("@bazel_skylib//lib:shell.bzl", "shell")
+load("//file:providers.bzl", "FileFilter")
 load("//util:path.bzl", "output_name", "runfile_path")
 load(":providers.bzl", "FormatterInfo")
 load(":runner.bzl", "create_runner")
@@ -10,6 +11,7 @@ def _format_impl(ctx):
     diff = ctx.attr._diff[DefaultInfo]
     dir_mode = ctx.attr.dir_mode
     file_mode = ctx.attr.file_mode
+    filter = ctx.attr._filter[FileFilter]
     formatter = ctx.attr.formatter[FormatterInfo]
     label = ctx.label
     name = ctx.attr.name
@@ -22,6 +24,8 @@ def _format_impl(ctx):
 
     file_defs = {}
     for src in srcs:
+        if not filter.fn(src):
+            continue
         path = output_name(file = src, label = ctx.label, prefix = prefix, strip_prefix = strip_prefix)
         formatted = actions.declare_file("%s.out/%s" % (name, src.path))
         formatter.fn(ctx, path, src, formatted)
@@ -79,6 +83,11 @@ format = rule(
             cfg = "exec",
             default = "//generate/diff:bin",
             executable = True,
+        ),
+        "_filter": attr.label(
+            default = ":format_filter",
+            doc = "Filter",
+            providers = [FileFilter],
         ),
         "_run": attr.label(
             default = "//generate/run:bin",

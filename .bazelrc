@@ -6,5 +6,7 @@ common --noincompatible_disallow_empty_glob
 common --repositories_without_autoloads=bazel_features_version,bazel_features_globals
 
 build --experimental_python_import_all_repositories=false
+build --//generate:format_filter=@git_changed_files//:filter
+build:lint_all --//generate:format_filter=//file:all_filter
 
 test --test_output=streamed

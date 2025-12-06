@@ -1,0 +1,4 @@
+#!/usr/bin/env bash
+export BUILD_RANDOM="$RANDOM"."$RANDOM"."$RANDOM"
+
+exec "$BAZEL_REAL" "$@"

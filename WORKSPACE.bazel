@@ -120,3 +120,11 @@ file_init()
 load("//rules:workspace.bzl", "file_repositories")
 
 file_repositories()
+
+# Git
+
+load("//git:workspace.bzl", "git_repositories")
+
+git_repositories(
+    root_file = "//:WORKSPACE.bazel",
+)

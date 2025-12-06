@@ -1,5 +1,20 @@
 load("@bazel_skylib//lib:shell.bzl", "shell")
 load("//util:path.bzl", "output_name", "runfile_path")
+load(":providers.bzl", "FileFilter")
+
+def _all_filter_impl(ctx):
+    file_filter = FileFilter(fn = _always)
+
+    return [file_filter]
+
+all_filter = rule(
+    doc = "Accept all files",
+    implementation = _all_filter_impl,
+    provides = [FileFilter],
+)
+
+def _always(src):
+    return True
 
 def _directory_impl(ctx):
     actions = ctx.actions
@@ -45,6 +60,32 @@ directory = rule(
         "output": attr.string(),
     },
     implementation = _directory_impl,
+)
+
+def _paths_filter_impl(ctx):
+    paths = ctx.attr.paths
+    label = ctx.label
+
+    changed = set(paths)
+
+    def filter(src):
+        path = src.short_path
+        if path.startswith("../"):
+            path = path[len("../"):]
+        path = path.split("/", 2)[2]
+        return path in changed
+
+    file_filter = FileFilter(fn = filter)
+
+    return [file_filter]
+
+paths_filter = rule(
+    attrs = {
+        "paths": attr.string_list(mandatory = True),
+    },
+    doc = "Paths filter",
+    implementation = _paths_filter_impl,
+    provides = [FileFilter],
 )
 
 def _untar_impl(ctx):
