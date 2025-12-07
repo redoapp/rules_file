@@ -23,7 +23,7 @@ def _git_changed_files_impl(ctx):
 
     files = set()
 
-    result = ctx.execute(["git", "diff", "--name-only", base_ref], working_directory = str(workspace))
+    result = ctx.execute(["git", "diff", "--name-only", "--merge-base", base_ref], working_directory = str(workspace))
     if result.return_code not in (0, 1):
         fail("git diff failed:\n%s" % result.stderr)
     files.update(result.stdout.strip().split("\n"))
