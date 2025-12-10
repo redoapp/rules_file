@@ -31,3 +31,13 @@ filegroup(
         ],
     ),
 )
+
+filegroup(
+    name = "github_workflow_files",
+    srcs = glob(
+        [
+            "files/.github/workflows/*.yaml",
+            "files/.github/workflows/*.yml",
+        ],
+    ),
+)

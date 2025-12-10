@@ -1,6 +1,7 @@
 load("//black:rules.bzl", "configure_black")
 load("//file:rules.bzl", "bazelrc_deleted_packages", "find_packages")
 load("//generate:rules.bzl", "format", "generate", "generate_test", "multi_generate")
+load("//jsonschema:rules.bzl", "jsonschema_validator")
 
 configure_black(
     name = "black",
@@ -19,6 +20,7 @@ multi_generate(
     deps = [
         ":black_format",
         ":buildifier_format",
+        ":github_workflow_validate",
     ],
 )
 
@@ -31,6 +33,18 @@ format(
     name = "buildifier_format",
     srcs = ["@files//:buildifier_files"],
     formatter = "//buildifier",
+    strip_prefix = "/files",
+)
+
+jsonschema_validator(
+    name = "github_workflow_validator",
+    schema = "@schemastore_github_workflow//file",
+)
+
+format(
+    name = "github_workflow_validate",
+    srcs = ["@files//:github_workflow_files"],
+    formatter = ":github_workflow_validator",
     strip_prefix = "/files",
 )
 

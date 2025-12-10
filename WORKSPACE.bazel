@@ -1,6 +1,6 @@
 workspace(name = "rules_file")
 
-load("@bazel_tools//tools/build_defs/repo:http.bzl", "http_archive")
+load("@bazel_tools//tools/build_defs/repo:http.bzl", "http_archive", "http_file")
 
 # Python
 RULES_PYTHON_VERSION = "1.4.1"
@@ -127,4 +127,21 @@ load("//git:workspace.bzl", "git_repositories")
 
 git_repositories(
     root_file = "//:WORKSPACE.bazel",
+)
+
+# jsonschema
+
+load("//jsonschema:workspace.bzl", "jsonschema_repositories", "jsonschema_toolchains")
+
+jsonschema_repositories()
+
+jsonschema_toolchains()
+
+# GitHub
+
+http_file(
+    name = "schemastore_github_workflow",
+    downloaded_file_path = "schema.json",
+    sha256 = "bee899219962fcedc944bb321e2b79a5ca9ff8b7aee9136c4edfbb2aa1eb7a06",
+    url = "https://raw.githubusercontent.com/SchemaStore/schemastore/402fdd800ea211bd1b9bccb1abcda4a2ba20073c/src/schemas/json/github-workflow.json",
 )
