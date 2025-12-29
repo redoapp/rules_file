@@ -1,3 +1,5 @@
+Deprecated. See [bazel-util](https://github.com/redoapp/bazel-util).
+
 # rules_file
 
 Bazel rules for basic file operations, such as creating directories and formatting.
